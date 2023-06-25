@@ -44,7 +44,6 @@ export class ResponseFun<T = any> implements NestInterceptor {
     const authorization: any = this.jwt.decode(
       context.switchToHttp().getRequest().headers.authorization?.split('Bearer ')?.[1],
     );
-    
     if (
       whiteList.findIndex(
         (item) => item === context.switchToHttp().getRequest().route.path,
@@ -62,10 +61,11 @@ export class ResponseFun<T = any> implements NestInterceptor {
       );
     }
 
+    console.log(dayjs().valueOf(), dayjs(authorization?.expirationTime)?.valueOf())
     if (
       !authorization ||
       !authorization.expirationTime ||
-      dayjs().valueOf() > dayjs(authorization?.expirationTime)?.valueOf()
+      dayjs().valueOf() > (dayjs(authorization?.expirationTime)?.valueOf())
     ) {
       throw new UnauthorizedException('请重新登录');
     }

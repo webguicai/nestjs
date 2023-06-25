@@ -1,6 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as svgCapcha from 'svg-captcha';
-import { LoginUserDto, UserDetailDto, UserEditDto,UsersListDto } from './dto/users.dto';
+import {
+  LoginUserDto,
+  UserDetailDto,
+  UserEditDto,
+  UsersListDto,
+} from './dto/users.dto';
 import { Users } from './entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
@@ -33,7 +38,13 @@ export class UsersService {
     });
     if (!sqlData) return { message: '账号或密码错误', data: sqlData };
     const resData = omit(sqlData, ['password', 'token']);
-    const token = this.jwt.sign({ ...resData }, jwtConstants);
+    const token = this.jwt.sign(
+      {
+        ...resData,
+        expirationTime: dayjs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
+      },
+      jwtConstants,
+    );
     this.users.update(
       { id: sqlData.id },
       {
@@ -45,7 +56,9 @@ export class UsersService {
   }
 
   async currentUser(req) {
-    const decodeToken: any = this.jwt.decode(req.headers.authorization?.split('Bearer ')?.[1]);
+    const decodeToken: any = this.jwt.decode(
+      req.headers.authorization?.split('Bearer ')?.[1],
+    );
     const sqlData = await this.users.findOneBy({
       id: decodeToken.id,
     });
@@ -56,14 +69,16 @@ export class UsersService {
   }
 
   outLogin(req) {
-    const decodeToken: any = this.jwt.decode(req.headers.authorization?.split('Bearer ')?.[1]);
+    const decodeToken: any = this.jwt.decode(
+      req.headers.authorization?.split('Bearer ')?.[1],
+    );
     this.users.update(
       {
         id: decodeToken.id,
       },
       {
         token: null,
-        expirationTime: null,
+        expirationTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       },
     );
     return { data: null };
