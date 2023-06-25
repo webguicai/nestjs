@@ -42,7 +42,10 @@ export class ResponseFun<T = any> implements NestInterceptor {
   constructor(private jwt: JwtService) {}
   intercept(context, next: CallHandler): Observable<data<T>> {
     const authorization: any = this.jwt.decode(
-      context.switchToHttp().getRequest().headers.authorization?.split('Bearer ')?.[1],
+      context
+        .switchToHttp()
+        .getRequest()
+        .headers.authorization?.split('Bearer ')?.[1],
     );
     if (
       whiteList.findIndex(
@@ -60,24 +63,24 @@ export class ResponseFun<T = any> implements NestInterceptor {
         }),
       );
     }
-    
+
     if (
       !authorization ||
       !authorization.expirationTime ||
-      dayjs().valueOf() > (dayjs(authorization?.expirationTime)?.valueOf())
+      dayjs().valueOf() > dayjs(authorization?.expirationTime)?.valueOf()
     ) {
       throw new UnauthorizedException('请重新登录');
     }
 
     return next.handle().pipe(
       map((resData = {}) => {
-        const { data = null, message = '成功', ...others } =resData
+        const { data = null, message = '成功', ...others } = resData;
         return {
           data,
           status: 'ok',
           success: true,
           message,
-          ...others
+          ...others,
         };
       }),
     );
