@@ -45,7 +45,7 @@ export class UsersService {
   }
 
   async currentUser(req) {
-    const decodeToken: any = this.jwt.decode(req.headers.authorization);
+    const decodeToken: any = this.jwt.decode(req.headers.authorization?.split('Bearer ')?.[1]);
     const sqlData = await this.users.findOneBy({
       id: decodeToken.id,
     });
@@ -56,7 +56,7 @@ export class UsersService {
   }
 
   outLogin(req) {
-    const decodeToken: any = this.jwt.decode(req.headers.authorization);
+    const decodeToken: any = this.jwt.decode(req.headers.authorization?.split('Bearer ')?.[1]);
     this.users.update(
       {
         id: decodeToken.id,

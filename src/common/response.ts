@@ -42,7 +42,7 @@ export class ResponseFun<T = any> implements NestInterceptor {
   constructor(private jwt: JwtService) {}
   intercept(context, next: CallHandler): Observable<data<T>> {
     const authorization: any = this.jwt.decode(
-      context.switchToHttp().getRequest().headers.authorization,
+      context.switchToHttp().getRequest().headers.authorization?.split('Bearer ')?.[1],
     );
     
     if (
