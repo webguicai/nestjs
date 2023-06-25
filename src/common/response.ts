@@ -60,8 +60,7 @@ export class ResponseFun<T = any> implements NestInterceptor {
         }),
       );
     }
-
-    console.log(dayjs().valueOf(), dayjs(authorization?.expirationTime)?.valueOf())
+    
     if (
       !authorization ||
       !authorization.expirationTime ||
