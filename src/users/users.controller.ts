@@ -8,6 +8,7 @@ import {
   Session,
   Query,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -18,7 +19,7 @@ import {
   UserDetailDto,
   UserEditDto,
 } from './dto/users.dto';
-import { UsersPipe } from './users.pipe';
+// import { UsersPipe } from './users.pipe';
 
 @Controller('users')
 @ApiBearerAuth()
@@ -35,20 +36,20 @@ export class UsersController {
     res.send(code.data);
   }
 
-  @Post('createUser')
-  @ApiOperation({ summary: '注册', description: '注册' })
-  createUser(
-    @Body(UsersPipe) CreateUserDto: CreateUserDto,
-    @Session() session,
-  ) {
-    if (
-      session?.code?.toLocaleLowerCase() ===
-      CreateUserDto?.code?.toLocaleLowerCase()
-    ) {
-      return { data: CreateUserDto };
-    }
-    return null;
-  }
+  // @Post('createUser')
+  // @ApiOperation({ summary: '注册', description: '注册' })
+  // createUser(
+  //   @Body(UsersPipe) CreateUserDto: CreateUserDto,
+  //   @Session() session,
+  // ) {
+  //   if (
+  //     session?.code?.toLocaleLowerCase() ===
+  //     CreateUserDto?.code?.toLocaleLowerCase()
+  //   ) {
+  //     return { data: CreateUserDto };
+  //   }
+  //   return null;
+  // }
 
   @Get('login')
   @ApiOperation({ summary: '登录', description: '登录' })
@@ -82,9 +83,21 @@ export class UsersController {
     return this.usersService.userDetail(UserDetailDto);
   }
 
+  @Post('createUser')
+  @ApiOperation({ summary: '创建用户', description: '创建用户' })
+  async createUser(@Body() CreateUserDto: CreateUserDto) {
+    return this.usersService.createUser(CreateUserDto);
+  }
+
   @Patch('userEdit')
   @ApiOperation({ summary: '编辑用户', description: '编辑用户' })
   async userEdit(@Query() UserEditDto: UserEditDto) {
     return this.usersService.userEdit(UserEditDto);
+  }
+
+  @Delete('deleteUser')
+  @ApiOperation({ summary: '删除用户', description: '删除用户' })
+  async deleteUser(@Query('id') id: string) {
+    return this.usersService.deleteUser(id);
   }
 }

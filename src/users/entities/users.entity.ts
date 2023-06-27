@@ -10,9 +10,6 @@ export class Users {
   @PrimaryGeneratedColumn('increment', { comment: '用户id' })
   id: number;
 
-  @Column({ type: 'varchar', comment: '昵称' })
-  nickName: string;
-
   @Column({ type: 'varchar', nullable: true, comment: '姓名' })
   userName: string;
 
@@ -32,9 +29,13 @@ export class Users {
   @CreateDateColumn({ type: 'timestamp', comment: '创建时间' })
   createTime: string;
 
+  // 1 正常 2 删除
+  @Column({ type: 'enum', enum: [1, 2], default: 1, comment: '状态' })
+  status: number;
+
   @Column({ type: 'timestamp', comment: '过期时间', nullable: true })
-  expirationTime: string
+  expirationTime: string;
 
   @Column({ type: 'varchar', length: 1000, comment: 'token', nullable: true })
-  token: string
+  token: string;
 }

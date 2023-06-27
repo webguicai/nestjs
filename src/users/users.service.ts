@@ -5,6 +5,7 @@ import {
   UserDetailDto,
   UserEditDto,
   UsersListDto,
+  CreateUserDto,
 } from './dto/users.dto';
 import { Users } from './entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -88,19 +89,18 @@ export class UsersService {
     const {
       current,
       pageSize,
-      nickName = '',
       phone = '',
       gender,
       userName = '',
     } = UsersListDto;
     const sqlData = await this.users.findAndCount({
       where: {
-        nickName: Like(`%${nickName}%`),
         phone: Like(`%${phone}%`),
         userName: Like(`%${userName}%`),
         gender: gender ? Number(gender) : null,
+        status: 1
       },
-      select: ['id', 'nickName', 'userName', 'phone', 'gender'],
+      select: ['id', 'userName', 'phone', 'gender', 'account'],
       skip: (current - 1) * pageSize,
       take: pageSize,
     });
@@ -111,7 +111,7 @@ export class UsersService {
     const { id } = UserDetailDto;
     const sqlData = await this.users.findOne({
       where: { id: Number(id) },
-      select: ['id', 'nickName', 'userName', 'phone', 'gender'],
+      select: ['id', 'userName', 'phone', 'gender', 'account', 'password'],
     });
     return { data: sqlData };
   }
@@ -123,5 +123,23 @@ export class UsersService {
       { gender: Number(gender), ...others },
     );
     return { data: null };
+  }
+
+  async createUser(CreateUserDto: CreateUserDto) {
+    const isHasOne = await this.users.findOneBy({ account: CreateUserDto.account })
+    if (isHasOne) return { data: null, message: '已存在对应账号' }
+    this.users.save(CreateUserDto)
+    const id = await this.users.find({
+      where: { account: CreateUserDto.account },
+      select: ['id']
+    });
+    return {
+      data: id,
+    };
+  }
+
+  async deleteUser(id: string) {
+    this.users.update({ id: Number(id) }, { status: 2 });
+    return { data: null, message: '删除成功' };
   }
 }

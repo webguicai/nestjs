@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from './config/config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MenusModule } from './menus/menus.module';
 
 @Module({
   imports: [
@@ -13,12 +14,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       port: 3306,
       username: 'root',
       password: 'Jyc@1234',
-      database: 'nest',
+      database: 'cashier_system',
       autoLoadEntities: true,
       synchronize: true,
       retryAttempts: 10,
-      retryDelay: 500
+      retryDelay: 500,
     }),
+    MenusModule,
   ],
   controllers: [],
   providers: [],
